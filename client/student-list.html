@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+	<title>첫번째 페이지</title>
+</head>
+<style>
+    table, tr, td, th{
+        border : 1px solid black;
+        border-collapse: collapse;
+        padding : 5px 10px;
+        text-align: center;
+    }
+</style>
+<body>
+	<div id="app">
+		<div v-if="Object.keys(info).length == 0">
+            <table>
+                <tr>
+                    <th>학번</th>
+                    <th>이름</th>
+                    <th>학과</th>
+                </tr>
+                <tr v-for="item in list">
+                    <td>{{item.stu_no}}</td>
+                    <td>
+                        <a href="javascript:;" @click="fnView(item.stu_no)">{{item.stu_name}}</a>
+                    </td>
+                    <td>{{item.stu_dept}}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div v-else>
+            <div>학번 : {{info.stu_no}}</div>
+            <div>이름 : {{info.stu_name}}</div>
+            <div>학과 : {{info.stu_dept}}</div>
+            <div>성별 : {{info.stu_gender}}</div>
+            <div>신장 : {{info.stu_height}}</div>
+            <div>
+                <button @click="info = {}">되돌아가기</button>
+                <button @click="fnRemove()">삭제하기</button>
+            </div>
+        </div>
+	</div>
+</body>
+</html>
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                list : [],
+                info : {}
+            };
+        },
+        methods: {
+            fnGetList(){
+                let self = this;
+				fetch("http://localhost:3000/student")
+                    .then( res => res.json() )
+                    .then( data => {
+                        self.list = data.list;
+                        console.log(data);
+                    })
+            },
+            fnView : function(stuNo) {
+                let self = this;
+                fetch("http://localhost:3000/student/" + stuNo)
+                    .then( res => res.json())
+                    .then( data => {
+                        self.info = data.info;
+                    })
+            },
+            fnRemove : function() {
+                let self = this;
+                fetch("http://localhost:3000/student/" + self.info.stu_no, {
+                    method : "DELETE"
+                })
+                    .then( res => res.json())
+                    .then( data => {
+                        alert("삭제되었습니다");
+                        self.info = {};
+                        self.fnGetList();
+                    })
+            }
+        },
+        mounted() {
+            var self = this;
+            self.fnGetList();
+        }
+    });
+    app.mount('#app');
+</script>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+	<title>첫번째 페이지</title>
+</head>
+<style>
+    table, tr, td, th{
+        border : 1px solid black;
+        border-collapse: collapse;
+        padding : 5px 10px;
+        text-align: center;
+    }
+</style>
+<body>
+	<div id="app">
+        <div>학번 : <input v-model="stuNo"></div>
+		<div>이름 : <input v-model="stuName"></div>
+        <button @click="fnLogin()">로그인</button>
+	</div>
+</body>
+</html>
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                list : [],
+                stuNo : "",
+                stuName : ""
+            };
+        },
+        methods: {
+            fnLogin(){
+                let self = this;
+
+                fetch("http://localhost:3000/student/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        stuNo: self.stuNo,
+                        stuName: self.stuName
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+
+                    if (data.result === "success") {
+                        alert("로그인 성공!");
+                        location.href = "student-list.html";
+                    } 
+                    else if (data.msg === "no_name") {
+                        alert("해당 이름을 가진 학생이 없습니다.");
+                    } 
+                    else if (data.msg === "wrong_no") {
+                        alert("학번을 확인해주세요.");
+                    } 
+                    else {
+                        alert("로그인 중 오류가 발생했습니다.");
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("서버 연결 오류");
+                });
+            }
+        },
+        mounted() {
+            var self = this;
+            self.fnGetList();
+        }
+    });
+    app.mount('#app');
+</script>
