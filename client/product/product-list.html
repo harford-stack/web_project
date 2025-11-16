@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+	<title>첫번째 페이지</title>
+</head>
+<style>
+    table, tr, td, th{
+        border : 1px solid black;
+        border-collapse: collapse;
+        padding : 5px 10px;
+        text-align: center;
+    }
+    a{
+        text-decoration: none;
+    }
+    input {
+        width: 100px;
+    }
+    td {
+        width: 120px;
+    }
+</style>
+<body>
+	<div id="app">
+        <div>
+            <button><a href="product-add.html">제품 추가</a></button>
+        </div>
+		<div>
+            <table>
+                <tr>
+                    <th>아이디</th>
+                    <th>이름</th>
+                    <th>가격</th>
+                    <th>종류</th>
+                    <th>{{productId == '' ? '수정' : '저장'}}</th>
+                    <th>{{productId == '' ? '삭제' : '취소'}}</th>
+
+                </tr>
+                <template v-for="item in list">
+                    <tr v-if="item.productId != productId">
+                        <td>{{item.productId}}</td>
+                        <td>{{item.productName}}</td>
+                        <td>{{item.price}}</td>
+                        <td>{{item.category}}</td>
+                        <td>
+                            <button v-if="productId == ''" @click="fnEditMode(item)">수정</button>
+                        </td>
+                        <td>
+                            <button v-if="productId == ''" @click="fnRemove(item.productId)">삭제</button>
+                        </td>
+                    </tr>
+                    <tr v-else>
+                        <td>{{info.productId}}</td>
+                        <td>
+                            <input v-model="info.productName">
+                        </td>
+                        <td>
+                            <input v-model="info.price">
+                        </td>
+                        <td>
+                            <input v-model="info.category">
+                        </td>
+                        <td>
+                            <button @click="fnSave">저장</button>
+                        </td>
+                        <td>
+                            <button @click="productId = ''">취소</button>
+                        </td>
+                    </tr>
+                </template>
+            </table>
+        </div>
+	</div>
+</body>
+</html>
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                list : [],
+                productId : "",
+                info : {}
+            };
+        },
+        methods: {
+            fnGetList(){
+                let self = this;
+				fetch("http://localhost:3000/product")
+                    .then( res => res.json() )
+                    .then( data => {
+                        self.list = data.list;
+                        console.log(self.list);
+                    } )
+            },
+            fnRemove(productId){
+                let self = this;
+                if(!confirm("삭제할거?")){
+                    return;
+                }
+				fetch("http://localhost:3000/product/" + productId, {
+                    method : "DELETE"
+                })
+                    .then( res => res.json() )
+                    .then( data => {
+                        alert("삭제되었습니다.");
+                        self.fnGetList();
+                    } )
+            },
+            fnEditMode : function(item){
+                let self = this;
+                self.productId = item.productId;
+                self.info = {...item}
+            },
+            fnSave : function(){
+                let self = this;
+                console.log(self.info);
+                fetch("http://localhost:3000/product/"+self.info.productId, {
+                    method : "PUT",
+                    headers : {
+                        "Content-type" : "application/json"
+                    },
+                    body : JSON.stringify(self.info)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert("수정되었습니다!");
+                    self.fnGetList();
+                    self.productId = "";
+
+                })
+            }
+        },
+        mounted() {
+            var self = this;
+            self.fnGetList();
+        }
+    });
+    app.mount('#app');
+</script>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+	<title>첫번째 페이지</title>
+</head>
+<style>
+    table, tr, td, th{
+        border : 1px solid black;
+        border-collapse: collapse;
+        padding : 5px 10px;
+        text-align: center;
+    }
+</style>
+<body>
+	<div id="app">
+		<div>
+            <div>
+                아이디 : <input v-model="userId">
+            </div>
+            <div>
+                비밀번호 : <input v-model="pwd">
+            </div>
+            <div>
+                이름 : <input v-model="userName">
+            </div>
+            <div>
+                <button @click="fnJoin">회원가입</button>
+            </div>
+        </div>
+	</div>
+</body>
+</html>
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                list : [],
+                userId : "",
+                pwd : "",
+                userName : ""
+
+            };
+        },
+        methods: {
+            fnJoin(){
+                let self = this;
+                let param = {
+                    userId : self.userId,
+                    pwd : self.pwd,
+                    userName : self.userName
+                };
+				fetch("http://localhost:3000/user/join",{
+                    method : "POST",
+                    headers : {
+                        "Content-type" : "application/json"   
+                    },
+                    body : JSON.stringify(param)
+                })
+                    .then( res => res.json() )
+                    .then( data => {
+                        alert("가입되었습니다!");
+                        console.log(data);
+                    } )
+            }
+        },
+        mounted() {
+            var self = this;
+        }
+    });
+    app.mount('#app');
+</script>

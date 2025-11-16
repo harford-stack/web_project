@@ -16,11 +16,17 @@
 </style>
 <body>
 	<div id="app">
-		<div>학번 : <input v-model="info.stuNo"></div>
-        <div>이름 : <input v-model="info.stuName"></div>
-        <div>학과 : <input v-model="info.stuDept"></div>
-        <div>
-            <button @click="fnAdd()">추가</button>
+		<div>
+            <div>
+                제품이름 : <input v-model="productName">
+            </div>
+            <div>
+                가격 : <input v-model="price">
+            </div>
+            <div>
+                종류 : <input v-model="category">
+            </div>
+            <button @click="fnAdd">저장</button>
         </div>
 	</div>
 </body>
@@ -29,34 +35,36 @@
     const app = Vue.createApp({
         data() {
             return {
-                info : {
-                    stuNo : "",
-                    stuName : "",
-                    stuDept : ""
-                }
+                productName : "",
+                price : "",
+                category : ""
             };
         },
         methods: {
             fnAdd(){
                 let self = this;
-				fetch("http://localhost:3000/student", {
+                let param = {
+                    productName : self.productName,
+                    price : self.price,
+                    category : self.category
+                };
+
+				fetch("http://localhost:3000/product", {
                     method : "POST",
                     headers : {
-                        "Content-type" : "application/json"
+                        "Content-type" : "application/json"   
                     },
-                    body : JSON.stringify(self.info)
+                    body : JSON.stringify(param)
                 })
                     .then( res => res.json() )
                     .then( data => {
-                        alert("추가되었습니다");
-                        location.href="student-list.html";
-                        self.fnGetList();
+                        alert("추가 완료");
+                        location.href="product-list.html";
                     })
             }
         },
         mounted() {
             var self = this;
-            
         }
     });
     app.mount('#app');
