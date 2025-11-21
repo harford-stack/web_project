@@ -56,6 +56,8 @@
                     .then( data => {
                         alert(data.msg);
                         if(data.result == "success"){
+                            console.log(data);
+                            localStorage.setItem("token", data.token); // localStorage는 브라우저의 저장 공간
                             location.href="../product/product-list.html";
                         }
                     } )

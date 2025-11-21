@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require("../db");
+const authMiddleware = require("../auth");
 
 router.get("/", async (req, res) => {
     try {
@@ -15,7 +16,7 @@ router.get("/", async (req, res) => {
     }
 })
 
-router.delete("/:productId", async (req, res) => {
+router.delete("/:productId", authMiddleware, async (req, res) => {
     let { productId } = req.params;
     try {
         let sql = "DELETE FROM TBL_PRODUCT WHERE PRODUCTID = " + productId;
