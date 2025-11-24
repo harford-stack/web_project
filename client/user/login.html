@@ -57,13 +57,13 @@
                         alert(data.msg);
                         if(data.result == "success"){
                             console.log(data);
-                            localStorage.setItem("token", data.token); // localStorage는 브라우저의 저장 공간
+                            localStorage.setItem("token", data.token); // localStorage는 브라우저가 가지는 저장 공간(브라우저가 닫히기 전까지)
                             location.href="../product/product-list.html";
                         }
                     } )
             }
         },
-        mounted() {
+        mounted() {ㄴ
             var self = this;
         }
     });
